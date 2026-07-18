@@ -3,20 +3,125 @@
         xmlns:vm="using:Noxius.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
         x:Class="Noxius.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Noxius">
+        Title="Noxius"
+        Background="#181124"
+        Width="450" Height="600"
+        WindowStartupLocation="CenterScreen">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Window.Styles>
+        <Style Selector="Button.AccentBtn">
+            <Setter Property="Background" Value="#FF007F"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="Button.AccentBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E60073"/>
+        </Style>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+        <Style Selector="Button.ControlBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#A599B5"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+        <Style Selector="Button.ControlBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#251B33"/>
+            <Setter Property="Foreground" Value="#FF007F"/>
+        </Style>
+    </Window.Styles>
 
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <Border Grid.Row="0" Background="#1D142C" Padding="15" BorderBrush="#2D1F42" BorderThickness="0,0,0,1">
+            <StackPanel Spacing="15">
+                <StackPanel>
+                    <TextBlock Text="This Is What You Came For" Foreground="White" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Rihanna" Foreground="#A599B5" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock Grid.Column="0" Text="1:32" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
+                    <Slider Grid.Column="1" Value="35" Minimum="0" Maximum="100" Margin="10,0" Foreground="#FF007F"/>
+                    <TextBlock Grid.Column="2" Text="3:45" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                    <Button Content="⏮" Classes="ControlBtn"/>
+                    <Button Content="▶" Classes="AccentBtn"/>
+                    <Button Content="⏭" Classes="ControlBtn"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto, *">
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="15,10">
+                <TextBlock Text="Плейлист" Foreground="#FF007F" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Grid.Column="1" Text="4 трека" Foreground="#A599B5" FontSize="12"/>
+            </Grid>
+
+            <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="#2D1F42"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="Padding" Value="15,10"/>
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#251B33"/>
+                    </Style>
+                </ListBox.Styles>
+
+                <ListBoxItem>
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <TextBlock Grid.Column="0" Text="1. " Foreground="#A599B5" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="10,0">
+                            <TextBlock Text="Work" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="Rihanna" Foreground="#A599B5" FontSize="11"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="3:45" Foreground="#A599B5" VerticalAlignment="Center"/>
+                    </Grid>
+                </ListBoxItem>
+
+                <ListBoxItem>
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <TextBlock Grid.Column="0" Text="2. " Foreground="#A599B5" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="10,0">
+                            <TextBlock Text="When It Rains It Pours" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="Lovebugs" Foreground="#A599B5" FontSize="11"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="4:09" Foreground="#A599B5" VerticalAlignment="Center"/>
+                    </Grid>
+                </ListBoxItem>
+
+                <ListBoxItem>
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <TextBlock Grid.Column="0" Text="3. " Foreground="#A599B5" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="10,0">
+                            <TextBlock Text="Vinyl" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="Fly by Midnight" Foreground="#A599B5" FontSize="11"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="3:56" Foreground="#A599B5" VerticalAlignment="Center"/>
+                    </Grid>
+                </ListBoxItem>
+            </ListBox>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#1D142C" Padding="15,10" BorderBrush="#2D1F42" BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <Button Grid.Column="0" Content="🔊" Classes="ControlBtn"/>
+                <Slider Grid.Column="1" Value="70" Minimum="0" Maximum="100" Margin="10,0" Foreground="#00F0FF"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                    <Button Content="🔀" Classes="ControlBtn"/>
+                    <Button Content="🔁" Classes="ControlBtn"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+    </Grid>
 </Window>
