@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Threading;
 
@@ -9,14 +7,14 @@ public class Track
 {
     public string Path { get; set; }
     public string Name { get; set; }
-    public string Author { get; set; }
+    public string Artist { get; set; }
     public TimeSpan Duration {get; set; }
 
-    public Track(string path, string name, string author, TimeSpan duration)
+    public Track(string path, string name, string artist, TimeSpan duration)
     {
         this.Path = path;
         this.Name = name;
-        this.Author = author;
+        this.Artist = artist;
         this.Duration = duration;
     }
 }

@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Noxius.ViewModels"
+        xmlns:models="using:Noxius.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
@@ -40,20 +41,20 @@
         <Border Grid.Row="0" Background="#1D142C" Padding="15" BorderBrush="#2D1F42" BorderThickness="0,0,0,1">
             <StackPanel Spacing="15">
                 <StackPanel>
-                    <TextBlock Text="This Is What You Came For" Foreground="White" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Rihanna" Foreground="#A599B5" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                    <TextBlock Text="{Binding CurrentTrack.Name}" Foreground="White" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentTrack.Artist}" Foreground="#A599B5" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                 </StackPanel>
 
                 <Grid ColumnDefinitions="Auto, *, Auto">
-                    <TextBlock Grid.Column="0" Text="1:32" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1" Value="35" Minimum="0" Maximum="100" Margin="10,0" Foreground="#FF007F"/>
-                    <TextBlock Grid.Column="2" Text="3:45" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="{Binding CurrentTimeText}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
+                    <Slider Grid.Column="1" Value="{Binding CurrentSeconds}" Minimum="0" Maximum="{Binding TotalSeconds}" Margin="10,0" Foreground="#FF007F"/>
+                    <TextBlock Grid.Column="2" Text="{Binding TotalTimeText}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                    <Button Content="⏮" Classes="ControlBtn"/>
-                    <Button Content="▶" Classes="AccentBtn"/>
-                    <Button Content="⏭" Classes="ControlBtn"/>
+                    <Button Content="⏮" Classes="ControlBtn" Command="{Binding PreviousTrack}"/>
+                    <Button Content="{Binding PlayButtonText}" Classes="AccentBtn" Command="{Binding PlayTrack}"/>
+                    <Button Content="⏭" Classes="ControlBtn" Command="{Binding NextTrack}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -61,10 +62,10 @@
         <Grid Grid.Row="1" RowDefinitions="Auto, *">
             <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="15,10">
                 <TextBlock Text="Плейлист" Foreground="#FF007F" FontWeight="Bold" FontSize="14"/>
-                <TextBlock Grid.Column="1" Text="4 трека" Foreground="#A599B5" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{Binding TracksCountText}" Foreground="#A599B5" FontSize="12"/>
             </Grid>
 
-            <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0" ItemsSource="{Binding Tracks}" SelectedItem="{Binding CurrentTrack}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Background" Value="Transparent"/>
@@ -76,46 +77,25 @@
                         <Setter Property="Background" Value="#251B33"/>
                     </Style>
                 </ListBox.Styles>
-
-                <ListBoxItem>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="models:Track">
                     <Grid ColumnDefinitions="Auto, *, Auto">
                         <TextBlock Grid.Column="0" Text="1. " Foreground="#A599B5" VerticalAlignment="Center"/>
                         <StackPanel Grid.Column="1" Margin="10,0">
-                            <TextBlock Text="Work" Foreground="White" FontSize="14"/>
-                            <TextBlock Text="Rihanna" Foreground="#A599B5" FontSize="11"/>
+                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14"/>
+                            <TextBlock Text="{Binding Artist}" Foreground="#A599B5" FontSize="11"/>
                         </StackPanel>
-                        <TextBlock Grid.Column="2" Text="3:45" Foreground="#A599B5" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{Binding Duration, StringFormat=\{0:mm\\:ss\}}" Foreground="#A599B5" VerticalAlignment="Center"/>
                     </Grid>
-                </ListBoxItem>
-
-                <ListBoxItem>
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <TextBlock Grid.Column="0" Text="2. " Foreground="#A599B5" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Margin="10,0">
-                            <TextBlock Text="When It Rains It Pours" Foreground="White" FontSize="14"/>
-                            <TextBlock Text="Lovebugs" Foreground="#A599B5" FontSize="11"/>
-                        </StackPanel>
-                        <TextBlock Grid.Column="2" Text="4:09" Foreground="#A599B5" VerticalAlignment="Center"/>
-                    </Grid>
-                </ListBoxItem>
-
-                <ListBoxItem>
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <TextBlock Grid.Column="0" Text="3. " Foreground="#A599B5" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Margin="10,0">
-                            <TextBlock Text="Vinyl" Foreground="White" FontSize="14"/>
-                            <TextBlock Text="Fly by Midnight" Foreground="#A599B5" FontSize="11"/>
-                        </StackPanel>
-                        <TextBlock Grid.Column="2" Text="3:56" Foreground="#A599B5" VerticalAlignment="Center"/>
-                    </Grid>
-                </ListBoxItem>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
         <Border Grid.Row="2" Background="#1D142C" Padding="15,10" BorderBrush="#2D1F42" BorderThickness="0,1,0,0">
             <Grid ColumnDefinitions="Auto, *, Auto">
                 <Button Grid.Column="0" Content="🔊" Classes="ControlBtn"/>
-                <Slider Grid.Column="1" Value="70" Minimum="0" Maximum="100" Margin="10,0" Foreground="#00F0FF"/>
+                <Slider Grid.Column="1" Value="{Binding Volume}" Minimum="0" Maximum="1" Margin="10,0" Foreground="#00F0FF"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
                     <Button Content="🔀" Classes="ControlBtn"/>
                     <Button Content="🔁" Classes="ControlBtn"/>
