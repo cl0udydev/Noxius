@@ -4,25 +4,52 @@ using Noxius.Models;
 using System.Collections.ObjectModel;
 using System.IO;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 
 namespace Noxius.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     private readonly AudioService _audioService = new();
-
-    public  ObservableCollection<Track> Tracks { get; set; } = new();
-    [ObservableProperty] private string _tracksCountText = "0 треков";
+    public ObservableCollection<Track> Tracks { get; set; } = new();
+    public string TracksCountText => $"({Tracks.Count} треков)";
     [ObservableProperty] private bool _isPlaying;
-    [ObservableProperty] private string _playButtonText = "▶";
     [ObservableProperty] private double _currentSeconds;
     [ObservableProperty] private double _totalSeconds;
     public string CurrentTimeText => TimeSpan.FromSeconds(CurrentSeconds).ToString(@"mm\:ss");
     public string TotalTimeText => TimeSpan.FromSeconds(TotalSeconds).ToString(@"mm\:ss");
     private bool _isEngineInitialized = false;
     private readonly Avalonia.Threading.DispatcherTimer _timer;
-
     [ObservableProperty] private Track? _currentTrack;
+    private readonly Random _random = new Random();
+    private bool _isLooping;
+    private bool _isShuffle;
+
+    public bool IsLooping
+    {
+        get => _isLooping;
+        set
+        {
+            _isLooping = value;
+            OnPropertyChanged(nameof(IsLooping));
+        }
+    }
+
+    public bool IsShuffle
+    {
+        get => _isShuffle;
+        set
+        {
+            _isShuffle = value;
+            OnPropertyChanged(nameof(IsShuffle));
+        }
+    }
+
     partial void OnCurrentTrackChanged(Track? value)
     {
         if (value != null)
@@ -33,7 +60,6 @@ public partial class MainViewModel : ViewModelBase
             TotalSeconds = _audioService.TotalSeconds;
             CurrentSeconds = 0;
         }
-        PlayButtonText = "⏸";
 
     }
 
@@ -46,21 +72,28 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        LoadLocalTracks();
         _timer = new();
         _timer.Interval = TimeSpan.FromMilliseconds(250);
         _timer.Tick += TimerTick;
         _timer.Start();
+        _audioService.SetVolume(_volume);
+
         _audioService.TrackFinished += () =>
         {
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => 
             {
                 IsPlaying = false;
-                NextTrack();   
+                
+                Track? nextTrack = GetNextTrack(); 
+                
+                if (nextTrack != null)
+                {
+                    CurrentTrack = nextTrack;
+                    _audioService.Play(nextTrack.Path); 
+                    IsPlaying = true;
+                }
             });
         };
-
-
     }
 
     public void PlayTrack()
@@ -72,7 +105,6 @@ public partial class MainViewModel : ViewModelBase
             _audioService.Play(CurrentTrack.Path);
             IsPlaying = true;
             _isEngineInitialized = true;
-            PlayButtonText = "⏸";
             return;
         }
 
@@ -80,48 +112,14 @@ public partial class MainViewModel : ViewModelBase
         {
             _audioService.Pause();
             IsPlaying = false;
-            PlayButtonText = "▶";
         }
         else
         {
             _audioService.Resume();
             IsPlaying = true;
-            PlayButtonText = "⏸";
         }
     }
 
-
-    public void LoadLocalTracks()
-    {
-        var filePaths = Directory.GetFiles(@"C:\Users\artem\Downloads", "*.mp3");
-
-        foreach (var path in filePaths)
-        {
-            var tfile = TagLib.File.Create(path);
-
-            string title = tfile.Tag.Title;
-            string artist = tfile.Tag.FirstPerformer;
-
-            if (string.IsNullOrEmpty(title))
-            {
-                title = Path.GetFileNameWithoutExtension(path);
-            }
-            if (string.IsNullOrEmpty(artist))
-            {
-                artist = "Неизвестный исполнитель";
-            }
-
-            TimeSpan duration = tfile.Properties.Duration;
-
-            var track = new Track(path, title, artist, duration);
-
-            Tracks.Add(track);
-            
-
-        }
-        TracksCountText = $"{Tracks.Count} треков";
-
-    }
 
     public void NextTrack()
     {
@@ -171,6 +169,70 @@ public partial class MainViewModel : ViewModelBase
         {
             _audioService.Seek(value);
         }
+    }
+
+    public async Task ChangeFolder()
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop || 
+            desktop.MainWindow == null) return;
+
+        var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+        if (topLevel == null) return;
+
+        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Выберите папку с музыкой",
+            AllowMultiple = false
+        });
+
+        var folder = folders.FirstOrDefault();
+        if (folder == null) return;
+        
+        string folderPath = folder.Path.LocalPath;
+
+        Tracks.Clear();
+
+        var extensions = new[] { ".mp3", ".wav", ".flac" };
+        var audioFiles = Directory.EnumerateFiles(folderPath, "*.*")
+            .Where(file => extensions.Contains(Path.GetExtension(file).ToLower()));
+
+        foreach (var file in audioFiles)
+        {
+            Tracks.Add(new Track(file, Path.GetFileNameWithoutExtension(file), "Неизвестен", TimeSpan.Zero));
+        }
+
+        OnPropertyChanged(nameof(TracksCountText));
+    }
+
+    private Track? GetNextTrack()
+    {
+        if (Tracks.Count == 0) return null;
+
+        if (IsLooping && CurrentTrack != null)
+        {
+            return CurrentTrack;
+        }
+
+        if (IsShuffle)
+        {
+            int randomIndex = _random.Next(0, Tracks.Count);
+            return Tracks[randomIndex];
+        }
+
+        if (CurrentTrack == null)
+        {
+            return Tracks[0]; 
+        }
+
+        int currentIndex = Tracks.IndexOf(CurrentTrack);
+        int nextIndex = currentIndex + 1;
+
+        if (nextIndex >= Tracks.Count)
+        {
+            return Tracks[0];
+        }
+
+        return Tracks[nextIndex];
     }
 
 }

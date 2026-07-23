@@ -14,92 +14,157 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Styles>
+        <Style Selector="Button.IconButton">
+            <Setter Property="Background" Value="#251B33"/>
+            <Setter Property="Foreground" Value="#A599B5"/>
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="CornerRadius" Value="19"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <Style Selector="Button.IconButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#322447"/>
+            <Setter Property="Foreground" Value="#FF007F"/>
+        </Style>
+
         <Style Selector="Button.AccentBtn">
             <Setter Property="Background" Value="#FF007F"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Padding" Value="15,5"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
         </Style>
+        
         <Style Selector="Button.AccentBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#E60073"/>
+            <Setter Property="Background" Value="#FF2693"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="Button.AccentBtn:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.95)"/>
         </Style>
 
-        <Style Selector="Button.ControlBtn">
+        <Style Selector="ListBoxItem">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#A599B5"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="BorderBrush" Value="#2D1F42"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="10,2"/>
         </Style>
-        <Style Selector="Button.ControlBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#251B33"/>
-            <Setter Property="Foreground" Value="#FF007F"/>
+        
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#231836"/>
+        </Style>
+        
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2D1F42"/>
+        </Style>
+        <Style Selector="ToggleButton.IconButton:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FF007F"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto, *, Auto">
-
-        <Border Grid.Row="0" Background="#1D142C" Padding="15" BorderBrush="#2D1F42" BorderThickness="0,0,0,1">
-            <StackPanel Spacing="15">
+        <Border Grid.Row="0" Background="#1D142C" Padding="20" BorderBrush="#2D1F42" BorderThickness="0,0,0,1">
+            <StackPanel Spacing="18">
                 <StackPanel>
-                    <TextBlock Text="{Binding CurrentTrack.Name}" Foreground="White" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding CurrentTrack.Artist}" Foreground="#A599B5" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                    <TextBlock Text="{Binding CurrentTrack.Name, FallbackValue='Не выбрано'}" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentTrack.Artist, FallbackValue='Исполнитель'}" Foreground="#A599B5" FontSize="13" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <Grid ColumnDefinitions="Auto, *, Auto">
-                    <TextBlock Grid.Column="0" Text="{Binding CurrentTimeText}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1" Value="{Binding CurrentSeconds}" Minimum="0" Maximum="{Binding TotalSeconds}" Margin="10,0" Foreground="#FF007F"/>
-                    <TextBlock Grid.Column="2" Text="{Binding TotalTimeText}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center"/>
+                <Grid ColumnDefinitions="40, *, 40">
+                    <TextBlock Grid.Column="0" Text="{Binding CurrentTimeText, FallbackValue='00:00'}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <Slider Grid.Column="1" Value="{Binding CurrentSeconds}" Minimum="0" Maximum="{Binding TotalSeconds, FallbackValue=100}" Margin="10,0" Foreground="#FF007F"/>
+                    <TextBlock Grid.Column="2" Text="{Binding TotalTimeText, FallbackValue='00:00'}" Foreground="#A599B5" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                    <Button Content="⏮" Classes="ControlBtn" Command="{Binding PreviousTrack}"/>
-                    <Button Content="{Binding PlayButtonText}" Classes="AccentBtn" Command="{Binding PlayTrack}"/>
-                    <Button Content="⏭" Classes="ControlBtn" Command="{Binding NextTrack}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" VerticalAlignment="Center">
+                    <Button Classes="IconButton" Command="{Binding PreviousTrack}">
+                        <PathIcon Data="M19 6L19 18M5 12L15 19L15 5L5 12Z" Width="14" Height="14"/>
+                    </Button>
+                    
+                    <Button Classes="AccentBtn" Command="{Binding PlayTrack}">
+                        <Panel>
+                            <PathIcon Data="M8 5V19L19 12L8 5Z" Width="18" Height="18" Foreground="White" IsVisible="{Binding !IsPlaying}"/>
+                            <PathIcon Data="M6 19h4V5H6v14zm8-14v14h4V5h-4z" Width="18" Height="18" Foreground="White" IsVisible="{Binding IsPlaying}"/>
+                        </Panel>
+                    </Button>
+                    
+                    <Button Classes="IconButton" Command="{Binding NextTrack}">
+                        <PathIcon Data="M5 6L5 18M19 12L9 5L9 19L19 12Z" Width="14" Height="14"/>
+                    </Button>
                 </StackPanel>
             </StackPanel>
         </Border>
 
         <Grid Grid.Row="1" RowDefinitions="Auto, *">
-            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="15,10">
-                <TextBlock Text="Плейлист" Foreground="#FF007F" FontWeight="Bold" FontSize="14"/>
-                <TextBlock Grid.Column="1" Text="{Binding TracksCountText}" Foreground="#A599B5" FontSize="12"/>
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="20,15,20,10" VerticalAlignment="Center">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="Плейлист" Foreground="#FF007F" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Text="{Binding TracksCountText, FallbackValue='(0)'}" Foreground="#A599B5" FontSize="13" VerticalAlignment="Bottom"/>
+                </StackPanel>
+                
+                <Button Grid.Column="2" Classes="IconButton" Width="32" Height="32" CornerRadius="16" Command="{Binding ChangeFolder}" ToolTip.Tip="Выбрать папку">
+                    <PathIcon Data="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z" Width="14" Height="14"/>
+                </Button>
             </Grid>
 
             <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0" ItemsSource="{Binding Tracks}" SelectedItem="{Binding CurrentTrack}">
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderBrush" Value="#2D1F42"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="Padding" Value="15,10"/>
-                    </Style>
-                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="#251B33"/>
-                    </Style>
-                </ListBox.Styles>
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="models:Track">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <TextBlock Grid.Column="0" Text="1. " Foreground="#A599B5" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Margin="10,0">
-                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14"/>
-                            <TextBlock Text="{Binding Artist}" Foreground="#A599B5" FontSize="11"/>
-                        </StackPanel>
-                        <TextBlock Grid.Column="2" Text="{Binding Duration, StringFormat=\{0:mm\\:ss\}}" Foreground="#A599B5" VerticalAlignment="Center"/>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="models:Track">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" Margin="5,0">
+                                <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14" FontWeight="Medium"/>
+                                <TextBlock Text="{Binding Artist}" Foreground="#A599B5" FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding Duration, StringFormat=\{0:mm\\:ss\}}" Foreground="#A599B5" FontSize="13" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-
-        <Border Grid.Row="2" Background="#1D142C" Padding="15,10" BorderBrush="#2D1F42" BorderThickness="0,1,0,0">
+        
+        <Border Grid.Row="2" Background="#1D142C" Padding="20,12" BorderBrush="#2D1F42" BorderThickness="0,1,0,0">
             <Grid ColumnDefinitions="Auto, *, Auto">
-                <Button Grid.Column="0" Content="🔊" Classes="ControlBtn"/>
-                <Slider Grid.Column="1" Value="{Binding Volume}" Minimum="0" Maximum="1" Margin="10,0" Foreground="#00F0FF"/>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
-                    <Button Content="🔀" Classes="ControlBtn"/>
-                    <Button Content="🔁" Classes="ControlBtn"/>
+                <Button Grid.Column="0" Classes="IconButton" Width="32" Height="32">
+                    <PathIcon Data="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" Width="14" Height="14"/>
+                </Button>
+                
+                <Slider Grid.Column="1" Value="{Binding Volume}" Minimum="0" Maximum="1" Margin="15,0" Foreground="#00F0FF"/>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton Classes="IconButton" 
+                                IsChecked="{Binding IsShuffle, Mode=TwoWay}" 
+                                ToolTip.Tip="Перемешать">
+                        <PathIcon Data="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" Width="14" Height="14"/>
+                    </ToggleButton>
+                    <ToggleButton Classes="IconButton" 
+                                IsChecked="{Binding IsLooping, Mode=TwoWay}" 
+                                ToolTip.Tip="Повтор">
+                        <PathIcon Data="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v3h12v-6h-2v4z" Width="14" Height="14"/>
+                    </ToggleButton>
                 </StackPanel>
+
             </Grid>
         </Border>
         
