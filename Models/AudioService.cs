@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging.Abstractions;
 using NAudio.Wave;
 using TagLib.Mpeg;
 using System;
